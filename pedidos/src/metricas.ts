@@ -15,7 +15,9 @@ const rutas: Record<string, MetricaRuta> = {};
 export function medirRutas(req: Request, res: Response, next: NextFunction): void {
   const inicio = performance.now();
   res.once("finish", () => {
-    const clave = `${req.method} ${req.path}`;
+    // Express usa el patrón registrado, no la URL concreta que envía el cliente.
+    const ruta = req.route?.path ?? "<sin ruta>";
+    const clave = `${req.method} ${ruta}`;
     const metrica = rutas[clave] ??= { solicitudes: 0, maxMs: 0 };
     metrica.solicitudes += 1;
     metrica.maxMs = Math.max(metrica.maxMs, Math.round(performance.now() - inicio));
