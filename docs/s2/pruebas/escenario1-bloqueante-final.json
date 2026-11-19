@@ -1,0 +1,16 @@
+[
+  {
+    "intento": 1,
+    "clienteMs": 2241.0,
+    "n": 8000000,
+    "primos": 539777,
+    "duracionMs": 2080
+  },
+  {
+    "intento": 2,
+    "clienteMs": 2522.0,
+    "n": 8000000,
+    "primos": 539777,
+    "duracionMs": 2480
+  }
+]
