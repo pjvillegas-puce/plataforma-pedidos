@@ -3,6 +3,8 @@ import {randomUUID} from "node:crypto"; // ES PARA GENERAR VALORES ALEATOREOS
 import {contarPrimos} from "./calculo"; ///
 import {Worker} from "node:worker_threads"; // importar el uso de lworker 
 import path from "node:path"
+import { contarPrimosEnPool, estadoPool, PoolLleno } from "./pool";
+import { estadoMetricas, medirRutas } from "./metricas";
 
 const PORT= Number(process.env.PORT?? 3000);
 const INVENTARIO_URL= process.env.INVENTARIO_URL ?? "http://localhost:3001";
@@ -20,6 +22,11 @@ interface Pedido {
 const pedidos: Pedido []=[];
 const app= express();
 app.use(express.json());
+app.use(medirRutas);
+
+app.get("/metricas", (_req: Request, res: Response) => {
+    res.json({ ...estadoMetricas(), pool: estadoPool() });
+});
 
 // consulta salud del servicio
 app.get ("/health",(_req: Request, res: Response) =>{
@@ -110,6 +117,23 @@ app.get("/reporte/worker", async (req: Request, res: Response )=>{
     const duracionMs=Math.round(performance.now()-inicio);
     res.json({modo:"worker",n, primos, duracionMs});
 
+});
+
+app.get("/reporte/pool", async (req: Request, res: Response) => {
+    const n = leerN(req);
+    const inicio = performance.now();
+    try {
+        const primos = await contarPrimosEnPool(n);
+        const duracionMs = Math.round(performance.now() - inicio);
+        res.json({ modo: "pool", n, primos, duracionMs });
+    } catch (error) {
+        if (error instanceof PoolLleno) {
+            res.setHeader("Retry-After", "1");
+            res.status(503).json({ error: error.message, pool: estadoPool() });
+            return;
+        }
+        res.status(500).json({ error: "No se pudo completar el reporte" });
+    }
 });
 
 // puerto en el que escucha

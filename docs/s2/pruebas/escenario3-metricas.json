@@ -1,0 +1,29 @@
+{
+  "bucle": {
+    "p50Ms": 10,
+    "p99Ms": 21,
+    "maxMs": 83
+  },
+  "nucleos": 16,
+  "rutas": {
+    "GET /health": {
+      "solicitudes": 7,
+      "maxMs": 6
+    },
+    "GET /metricas": {
+      "solicitudes": 1,
+      "maxMs": 2
+    },
+    "GET /reporte/pool": {
+      "solicitudes": 2829,
+      "maxMs": 3803
+    }
+  },
+  "pool": {
+    "maxTrabajadores": 16,
+    "activos": 0,
+    "enCola": 0,
+    "maxCola": 32,
+    "rechazadas": 2512
+  }
+}
